@@ -49,7 +49,7 @@ class RNBaseNode(metaclass=FormMetaClass):
 
     # based on SFNR code (GPL v3)
     @classmethod
-    def install(cls, node_dir, port):
+    def install(cls, node_dir, address="localhost:8080"):
 
         try:
             os.mkdir(node_dir)
@@ -60,11 +60,11 @@ class RNBaseNode(metaclass=FormMetaClass):
             in_path = Path(__file__).parent / "templates" / ("%s.%s.in" % (cls.rednode_template, ext))
             out_path = node_dir / ("%s.%s" % (cls.name, ext))
 
-            cls._install_template(in_path, out_path, node_dir, port)
+            cls._install_template(in_path, out_path, address)
 
     # based on SFNR code (GPL)
     @classmethod
-    def _install_template(cls, in_path, out_path, node_dir, port):
+    def _install_template(cls, in_path, out_path, address):
 
         defaults = {}
         form = ""
@@ -114,7 +114,7 @@ class RNBaseNode(metaclass=FormMetaClass):
 
         t = open(in_path).read()
 
-        t = t % {'port': port,
+        t = t % {'host': address,
                  'name': cls.name,
                  'title': cls.title,
                  'icon': cls.icon,

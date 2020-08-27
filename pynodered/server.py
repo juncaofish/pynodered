@@ -21,16 +21,19 @@ app.register_blueprint(api.as_blueprint())
 
 
 def node_directory(package_name):
-    return Path.home() / ".node-red" / "node_modules" / package_name  # assume this also work on MacOS and Windows...
+    return Path.cwd() / ".node-red" / "node_modules" / package_name  # assume this also work on MacOS and Windows...
 
 
 def main():
     parser = argparse.ArgumentParser(prog='pynodered')
     parser.add_argument('--noinstall', action="store_true",
-                        help="do not install javascript files to save startup time. It is only necessary to install the files once or whenever a python function change")
-    parser.add_argument('--port',
-                        help="port to use by Flask to run the Python server handling the request from Node-RED",
-                        default=5051)
+                        help="do not install javascript files to save startup time. "
+                             "It is only necessary to install the files once or whenever a python function change")
+    parser.add_argument('--debug', action="store_true",
+                        help="debug flag")
+    parser.add_argument('--address',
+                        help="request host address",
+                        default="localhost:8080")
     parser.add_argument('filenames', help='list of python file names or module names', nargs='+')
     args = parser.parse_args(sys.argv[1:])
 
@@ -91,7 +94,7 @@ def main():
             if hasattr(obj, "install") and hasattr(obj, "work") and hasattr(obj, "run") and hasattr(obj, "name"):
                 print(f"From {name} register {obj.name}")
                 if not args.noinstall:
-                    obj.install(node_dir, args.port)
+                    obj.install(node_dir, args.address)
                     print("Install %s" % name)
                     packages[package_name]["node-red"]["nodes"][obj.name] = obj.name + '.js'
 
@@ -116,8 +119,7 @@ def main():
     #     # Filter out rules we can't navigate to in a browser
     #     # and rules that require parameters
     #     print(rule.methods,rule.endpoint)
-
-    app.run(host='127.0.0.1', port=args.port)  # , debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=args.debug)
 
 
 if __name__ == '__main__':
